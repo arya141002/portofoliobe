@@ -4,17 +4,23 @@ const helmet = require('helmet');
 const pool = require('./config/db');
 
 const app = express();
+const auth = require('./middlewares/auth');
+app.get('/api/me', auth, (req, res) => res.json({ admin: req.admin }));
 
 app.use(helmet());
 app.use(cors({ origin: process.env.CORS_ORIGIN }));
 app.use(express.json({ limit: '10kb' }));
 
 app.get('/api/health', async (req, res, next) => {
-  app.get('/api/health', async (req, res) => {
-  await pool.query('SELECT 1');
-  res.json({ status: 'ok', db: 'connected' });
+  try {
+    await pool.query('SELECT 1');
+    res.json({ status: 'ok', db: 'connected' });
+  } catch (err) {
+    next(err);
+  }
 });
-});
+
+app.use('/api/auth', require('./routes/auth'));
 
 // 404: dipasang setelah semua route
 app.use((req, res) => {
