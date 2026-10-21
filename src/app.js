@@ -4,7 +4,9 @@ const helmet = require('helmet');
 const pool = require('./config/db');
 
 const app = express();
+app.set('trust proxy', 1);
 const auth = require('./middlewares/auth');
+
 app.get('/api/me', auth, (req, res) => res.json({ admin: req.admin }));
 
 app.use(helmet());
@@ -21,6 +23,11 @@ app.get('/api/health', async (req, res, next) => {
 });
 
 app.use('/api/auth', require('./routes/auth'));
+app.use('/api/projects', require('./routes/projects'));
+app.use('/api/messages', require('./routes/messages'));
+app.use('/api/testimonials', require('./routes/testimonials'));
+app.use('/api/admin/testimonials', require('./routes/adminTestimonials'));
+app.use('/api/chat', require('./routes/chat'));
 
 // 404: dipasang setelah semua route
 app.use((req, res) => {
